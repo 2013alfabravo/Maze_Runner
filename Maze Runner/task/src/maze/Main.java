@@ -20,4 +20,8 @@ public class Main {
             System.out.print("\n");
         }
     }
+
+    public void method() {
+
+    }
 }

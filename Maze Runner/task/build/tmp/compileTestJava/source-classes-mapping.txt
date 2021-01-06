@@ -1,7 +1,0 @@
-maze/MainTest.java
- maze.MainTest
-MazeRunnerTest.java
- Clue
- Elem
- Maze
- MazeRunnerTest

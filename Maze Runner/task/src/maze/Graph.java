@@ -1,22 +1,15 @@
 package maze;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Graph {
-    List<Node> nodes;
+    List<Node> nodes = new ArrayList<>();
     Node start;
-
-    public Graph() {
-        nodes = new ArrayList<>();
-    }
 
     public void addNode(String label) {
         Node node = new Node(label);
-        if (nodes.isEmpty()) {
-            start = node;
-        }
-
-        nodes.add(node);
+        addNode(node);
     }
 
     public void addNode(Node node) {
@@ -31,59 +24,91 @@ public class Graph {
         to.addLink(from, weight);
     }
 
-    public Graph buildMST() {
-        // need to be completed
-        Set<Node> visited = new HashSet<>();
-        PriorityQueue<Edge> queue = new PriorityQueue<>();
+    public void addLink(String from, String to, int weight) {
+        Node fromNode = findNode(from);
+        Node toNode = findNode(to);
 
-        Node current = start;
-        visited.add(current);
-
-        for (Edge edge : current.adjacencyList) {
-            queue.add(edge);
+        if (fromNode == null || toNode == null) {
+            throw new IllegalArgumentException();
         }
 
+        addLink(fromNode, toNode, weight);
+    }
 
-        while (!queue.isEmpty()) {
-            if (visited.contains(current)) {
+    private Node findNode(String label) {
+        return nodes.stream()
+                .filter(node -> node.label.equals(label))
+                .findAny()
+                .orElse(null);
+    }
+
+    public Graph buildMST() {
+        Graph mst = new Graph();
+        Set<String> visited = new HashSet<>();
+        int edgeCount = 0;
+
+        mst.addNode(start.label);
+        visited.add(start.label);
+
+        PriorityQueue<Edge> queue = new PriorityQueue<>(start.adjacencyList);
+
+        while (!queue.isEmpty() && edgeCount != nodes.size() - 1) {
+            Edge edge = queue.poll();
+            Node from = edge.from;
+            Node current = edge.to;
+
+            if (visited.contains(current.label)) {
                 continue;
             }
+
+            mst.addNode(current.label);
+            mst.addLink(from.label, current.label, edge.weight);
+            edgeCount++;
+
+            visited.add(current.label);
+            queue.addAll(current.adjacencyList);
         }
 
+        return mst;
+    }
 
+    // Works correctly for MST only, not suitable to other graphs
+    public int getMSTTotalWeight() {
+        Set<String> visited = new HashSet<>();
+        int totalWeight = 0;
 
-        return null;
+        Queue<Edge> queue = new ArrayDeque<>(start.adjacencyList);
+        visited.add(start.label);
+
+        while (!queue.isEmpty()) {
+            Edge edge = queue.poll();
+            Node current = edge.to;
+            if (visited.contains(current.label)) {
+                continue;
+            }
+
+            totalWeight += edge.weight;
+            visited.add(current.label);
+            queue.addAll(current.adjacencyList);
+        }
+
+        return totalWeight;
     }
 
     @Override
     public String toString() {
-        return nodes.toString();
-    }
-
-    public static void main(String[] args) {
-        Graph graph = new Graph();
-        Node nodeA = new Node("A");
-        graph.addNode(nodeA);
-        Node nodeB = new Node("B");
-        graph.addNode(nodeB);
-        Node nodeC = new Node("C");
-        graph.addNode(nodeC);
-
-        graph.addLink(nodeA, nodeB, 1);
-        graph.addLink(nodeB, nodeC, 1);
-        graph.addLink(nodeC, nodeA, 1);
-
-        System.out.println(graph);
+        return nodes.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining("\n"));
     }
 }
 
 class Node {
-    String label;
-    List<Edge> adjacencyList;
+    final String label;
+    final List<Edge> adjacencyList = new ArrayList<>();
 
     public Node(String label) {
         this.label = label;
-        this.adjacencyList = new ArrayList<>();
     }
 
     public void addLink(Node other, int weight) {
@@ -92,7 +117,7 @@ class Node {
 
     @Override
     public String toString() {
-        return label + " " + adjacencyList;
+        return label + ": " + adjacencyList;
     }
 }
 
@@ -109,11 +134,11 @@ class Edge implements Comparable<Edge> {
 
     @Override
     public String toString() {
-        return from.label + "->" + to.label + "[" + weight + "]";
+        return from.label + " --" + weight + "-> " + to.label;
     }
 
     @Override
-    public int compareTo(Edge o) {
-        return this.weight - o.weight;
+    public int compareTo(Edge other) {
+        return this.weight - other.weight;
     }
 }

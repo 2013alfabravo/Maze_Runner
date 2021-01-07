@@ -91,6 +91,14 @@ public class Graph {
 
         return totalWeight;
     }
+    
+    // Works correctly for any graph
+    public int getTotalGraphWeight() {
+        return nodes.stream()
+                .flatMap(node -> node.adjacencyList.stream())
+                .mapToInt(edge -> edge.weight)
+                .sum() / 2;
+    }
 
     @Override
     public String toString() {

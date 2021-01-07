@@ -30,9 +30,8 @@ public class Main {
 
         System.out.println(mst);
 
-        System.out.println("MST weight: " + mst.getMSTTotalWeight()); // 39
-        System.out.println("Total weight graph: " + graph.getTotalGraphWeight());
-        System.out.println("Total weight MST: " + mst.getTotalGraphWeight());
+        System.out.println("Total weight graph: " + graph.getTotalGraphWeight()); // 78
+        System.out.println("Total weight MST: " + mst.getTotalGraphWeight()); // 39
     }
 //        Scanner scanner = new Scanner(System.in);
 //        int rows = scanner.nextInt();

@@ -71,7 +71,8 @@ public class Graph {
     }
 
     // Works correctly for MST only, not suitable to other graphs
-    public int getMSTTotalWeight() {
+    @Deprecated
+    public int getTotalMSTWeight() {
         Set<String> visited = new HashSet<>();
         int totalWeight = 0;
 

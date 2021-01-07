@@ -54,19 +54,17 @@ public class Graph {
 
         while (!queue.isEmpty() && edgeCount != nodes.size() - 1) {
             Edge edge = queue.poll();
-            Node from = edge.from;
-            Node current = edge.to;
 
-            if (visited.contains(current.label)) {
+            if (visited.contains(edge.to.label)) {
                 continue;
             }
 
-            mst.addNode(current.label);
-            mst.addLink(from.label, current.label, edge.weight);
+            mst.addNode(edge.to.label);
+            mst.addLink(edge.from.label, edge.to.label, edge.weight);
             edgeCount++;
 
-            visited.add(current.label);
-            queue.addAll(current.adjacencyList);
+            visited.add(edge.to.label);
+            queue.addAll(edge.to.adjacencyList);
         }
 
         return mst;
@@ -82,14 +80,13 @@ public class Graph {
 
         while (!queue.isEmpty()) {
             Edge edge = queue.poll();
-            Node current = edge.to;
-            if (visited.contains(current.label)) {
+            if (visited.contains(edge.to.label)) {
                 continue;
             }
 
             totalWeight += edge.weight;
-            visited.add(current.label);
-            queue.addAll(current.adjacencyList);
+            visited.add(edge.to.label);
+            queue.addAll(edge.to.adjacencyList);
         }
 
         return totalWeight;

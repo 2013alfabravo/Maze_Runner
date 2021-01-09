@@ -12,6 +12,26 @@ public class Graph {
         addNode(node);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        List<Edge> graph1Edges = new ArrayList<>();
+        for (Node node : nodes) {
+            graph1Edges.addAll(node.adjacencyList);
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        Graph graph2 = (Graph) obj;
+        List<Edge> graph2Edges = new ArrayList<>();
+
+        for (Node node : graph2.nodes) {
+            graph2Edges.addAll(node.adjacencyList);
+        }
+
+        return graph1Edges.containsAll(graph2Edges);
+    }
+
     private void addNode(Node node) {
         if (nodes.isEmpty()) {
             start = node;
@@ -124,6 +144,16 @@ public class Graph {
         public String toString() {
             return label + ": " + adjacencyList;
         }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return super.equals(obj);
+        }
     }
 
     private class Edge implements Comparable<Edge> {
@@ -145,6 +175,26 @@ public class Graph {
         @Override
         public int compareTo(Edge other) {
             return this.weight - other.weight;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Edge edge = (Edge) o;
+
+            if (weight != edge.weight) return false;
+            if (!this.from.label.equals(edge.from.label)) return false;
+            return to.label.equals(edge.to.label);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = from.hashCode();
+            result = 31 * result + to.hashCode();
+            result = 31 * result + weight;
+            return result;
         }
     }
 

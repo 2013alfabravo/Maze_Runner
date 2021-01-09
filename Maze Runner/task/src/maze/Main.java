@@ -12,7 +12,7 @@ public class Main {
         graph.addNode("G");     //  8         9         10
         graph.addNode("H");     //  |         |         |
         graph.addNode("I");     // "G" --11- "H" --5-- "I"
-
+        // A, D, E, B, C, F, G, H, I
         graph.addLink("A", "B", 6);
         graph.addLink("A", "D", 3);
         graph.addLink("B", "C", 4);

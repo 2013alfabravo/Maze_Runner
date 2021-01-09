@@ -2,6 +2,7 @@ package maze;
 
 public class Main {
     public static void main(String[] args) {
+<<<<<<< HEAD
         Graph graph = new Graph();
         graph.addNode("A");     // "A" --6-- "B" --4-- "C"
         graph.addNode("B");     //  |         |         |
@@ -63,5 +64,24 @@ public class Main {
 
     public void method() {
 
+=======
+        int[][] maze = {    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                            {0, 0, 1, 0, 1, 0, 1, 0, 0, 1},
+                            {1, 0, 1, 0, 0, 0, 1, 0, 1, 1},
+                            {1, 0, 0, 0, 1, 1, 1, 0, 0, 1},
+                            {1, 0, 1, 0, 1, 0, 1, 0, 1, 1},
+                            {1, 0, 1, 0, 0, 0, 0, 0, 1, 1},
+                            {1, 0, 1, 0, 1, 1, 1, 0, 0, 1},
+                            {1, 0, 1, 0, 0, 0, 1, 0, 1, 1},
+                            {1, 0, 1, 1, 0, 1, 1, 0, 0, 0},
+                            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}  };
+
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[i].length; j++) {
+                System.out.print(maze[i][j] == 1 ? "\u2588\u2588" : "  ");
+            }
+            System.out.print("\n");
+        }
+>>>>>>> 453924273d5037e7bc225aa07a8d620d4dfc3050
     }
 }

@@ -12,14 +12,14 @@ public class Graph {
         addNode(node);
     }
 
-    public void addNode(Node node) {
+    private void addNode(Node node) {
         if (nodes.isEmpty()) {
             start = node;
         }
         nodes.add(node);
     }
 
-    public void addLink(Node from, Node to, int weight) {
+    private void addLink(Node from, Node to, int weight) {
         from.addLink(to, weight);
         to.addLink(from, weight);
     }
@@ -107,44 +107,48 @@ public class Graph {
                 .map(String::valueOf)
                 .collect(Collectors.joining("\n"));
     }
+
+    private class Node {
+        final String label;
+        final List<Edge> adjacencyList = new ArrayList<>();
+
+        private Node(String label) {
+            this.label = label;
+        }
+
+        private void addLink(Node other, int weight) {
+            adjacencyList.add(new Edge(this, other, weight));
+        }
+
+        @Override
+        public String toString() {
+            return label + ": " + adjacencyList;
+        }
+    }
+
+    private class Edge implements Comparable<Edge> {
+        Node from;
+        Node to;
+        int weight;
+
+        public Edge(Node from, Node to, int weight) {
+            this.from = from;
+            this.to = to;
+            this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return from.label + " --" + weight + "-> " + to.label;
+        }
+
+        @Override
+        public int compareTo(Edge other) {
+            return this.weight - other.weight;
+        }
+    }
+
 }
 
-class Node {
-    final String label;
-    final List<Edge> adjacencyList = new ArrayList<>();
 
-    public Node(String label) {
-        this.label = label;
-    }
 
-    public void addLink(Node other, int weight) {
-        adjacencyList.add(new Edge(this, other, weight));
-    }
-
-    @Override
-    public String toString() {
-        return label + ": " + adjacencyList;
-    }
-}
-
-class Edge implements Comparable<Edge> {
-    Node from;
-    Node to;
-    int weight;
-
-    public Edge(Node from, Node to, int weight) {
-        this.from = from;
-        this.to = to;
-        this.weight = weight;
-    }
-
-    @Override
-    public String toString() {
-        return from.label + " --" + weight + "-> " + to.label;
-    }
-
-    @Override
-    public int compareTo(Edge other) {
-        return this.weight - other.weight;
-    }
-}

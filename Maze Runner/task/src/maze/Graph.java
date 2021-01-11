@@ -93,9 +93,12 @@ public class Graph {
     public boolean isConnected(String from, String to) {
         Node fromNode = findNode(from);
         if (fromNode == null)
-            return false;
+            throw new IllegalArgumentException();
 
-        Optional<Edge> connection = fromNode.adjacencyList.stream().filter(it -> it.to.label.equals(to)).findAny();
+        Optional<Edge> connection = fromNode.adjacencyList
+                .stream()
+                .filter(edge -> edge.to.label.equals(to))
+                .findAny();
 
         return connection.isPresent();
     }

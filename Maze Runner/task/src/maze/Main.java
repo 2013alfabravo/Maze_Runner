@@ -1,38 +1,77 @@
 package maze;
 
+import java.util.Random;
+
 public class Main {
     public static void main(String[] args) {
-<<<<<<< HEAD
+        Random rnd = new Random();
+        int[][] maze = new int[8][8];
         Graph graph = new Graph();
-        graph.addNode("A");     // "A" --6-- "B" --4-- "C"
-        graph.addNode("B");     //  |         |         |
-        graph.addNode("C");     //  3         2         12
-        graph.addNode("D");     //  |         |         |
-        graph.addNode("E");     // "D" --1-- "E" --7-- "F"
-        graph.addNode("F");     //  |         |         |
-        graph.addNode("G");     //  8         9         10
-        graph.addNode("H");     //  |         |         |
-        graph.addNode("I");     // "G" --11- "H" --5-- "I"
-        // A, D, E, B, C, F, G, H, I
-        graph.addLink("A", "B", 6);
-        graph.addLink("A", "D", 3);
-        graph.addLink("B", "C", 4);
-        graph.addLink("B", "E", 2);
-        graph.addLink("C", "F", 12);
-        graph.addLink("D", "E", 1);
-        graph.addLink("D", "G", 8);
-        graph.addLink("E", "F", 7);
-        graph.addLink("E", "H", 9);
-        graph.addLink("F", "I", 10);
-        graph.addLink("G", "H", 11);
-        graph.addLink("H", "I", 5);
+
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[i].length; j++) {
+                graph.addNode(i + ":" + j);
+            }
+        }
+
+        // coordinates are bound to nodes as labels in "row:col" format
+        // and links between nodes are made using a grid pattern, see GraphTest for reference
+
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[i].length; j++) {
+                if (i != maze.length - 1) {
+                    graph.addLink(i + ":" + j, (i + 1) + ":" + j, rnd.nextInt(100));
+                }
+
+                if (i != 0) {
+                    graph.addLink(i + ":" + j, (i - 1) + ":" + j, rnd.nextInt(100));
+                }
+
+                if (j != maze[i].length - 1) {
+                    graph.addLink(i + ":" + j, i + ":" + (j + 1), rnd.nextInt(100));
+                }
+
+                if (j != 0) {
+                    graph.addLink(i + ":" + j, i + ":" + (j - 1), rnd.nextInt(100));
+                }
+            }
+        }
 
         Graph mst = graph.buildMST();
 
-        System.out.println(mst);
+        // we render our maze as follows: nodes and links between nodes are free cells and other cells are walls
+        // plus we surround our maze with walls on all four sides
+        // we do not have an entry and an exit yet and what is more important we yet do not adjust the size of our
+        // maze according to user's input as required by the project's stage.
 
-        System.out.println("Total weight graph: " + graph.getTotalGraphWeight()); // 78
-        System.out.println("Total weight MST: " + mst.getTotalGraphWeight()); // 39
+        // to avoid this mess we can first make a matrix of zeroes and ones and we used on the previous stage
+        // and then print it on the screen
+        System.out.println("\u2588\u2588".repeat(maze.length * 2 + 2));     // top wall
+        for (int i = 0; i < maze.length * 2; i += 2) {
+            System.out.print("\u2588\u2588");                               // left wall
+            for (int j = 0; j < maze[i / 2].length * 2; j += 2) {
+                System.out.print("  ");
+                if (mst.isConnected((i / 2) + ":" + (j / 2), (i / 2) + ":" + (j / 2 + 1))) {
+                    System.out.print("  ");
+                } else {
+                    System.out.print("\u2588\u2588");
+                }
+            }
+            System.out.println("\u2588\u2588");                             // right wall
+
+            System.out.print("\u2588\u2588");
+            for (int j = 0; j < maze[i / 2].length * 2; j += 2) {
+                if (mst.isConnected((i / 2) + ":" + (j / 2), (i / 2 + 1) + ":" + (j / 2))) {
+                    System.out.print("  ");
+                } else {
+                    System.out.print("\u2588\u2588");
+                }
+                System.out.print("\u2588\u2588");
+            }
+            System.out.println("\u2588\u2588");
+        }
+        System.out.println("\u2588\u2588".repeat(maze.length * 2 + 2));     // bottom wall
+
     }
 //        Scanner scanner = new Scanner(System.in);
 //        int rows = scanner.nextInt();
@@ -64,7 +103,6 @@ public class Main {
 
     public void method() {
 
-=======
         int[][] maze = {    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                             {0, 0, 1, 0, 1, 0, 1, 0, 0, 1},
                             {1, 0, 1, 0, 0, 0, 1, 0, 1, 1},
@@ -82,6 +120,5 @@ public class Main {
             }
             System.out.print("\n");
         }
->>>>>>> 453924273d5037e7bc225aa07a8d620d4dfc3050
     }
 }

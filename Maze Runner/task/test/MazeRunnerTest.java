@@ -362,21 +362,41 @@ class Maze {
 
 }
 
-public class MazeRunnerTest extends StageTest {
+class Clue {
+    int size;
+    Clue(int s) {
+        size = s;
+    }
+}
+
+public class MazeRunnerTest extends StageTest<Clue> {
 
     public MazeRunnerTest() {
         super(Main.class);
     }
 
     @Override
-    public List<TestCase> generate() {
+    public List<TestCase<Clue>> generate() {
         return List.of(
-            new TestCase()
+            new TestCase<Clue>()
+                .setInput("0"),
+
+            new TestCase<Clue>()
+                .setInput("1\n17\n0")
+                .setAttach(new Clue(17)),
+
+            new TestCase<Clue>()
+                .setInput("1\n15\n3\ntest_maze.txt\n0")
+                .setAttach(new Clue(15)),
+
+            new TestCase<Clue>()
+                .setInput("2\ntest_maze.txt\n4\n0")
+                .setAttach(new Clue(15))
         );
     }
 
     @Override
-    public CheckResult check(String reply, Object clue) {
+    public CheckResult check(String reply, Clue clue) {
 
         List<Maze> mazes;
         try {
@@ -387,7 +407,14 @@ public class MazeRunnerTest extends StageTest {
             );
         }
 
-        if (mazes.size() == 0) {
+        if (clue == null && mazes.size() == 0) {
+            return CheckResult.correct();
+        } else if (clue == null) {
+            return CheckResult.wrong(
+                "In this test no maze should be shown, but one was shown. " +
+                    "Try to use \\u2588 character only to print the maze."
+            );
+        } else if (mazes.size() == 0) {
             return CheckResult.wrong(
                 "No mazes found in the output. Check if you are using " +
                     "\\u2588 character to print the maze."
@@ -417,6 +444,18 @@ public class MazeRunnerTest extends StageTest {
                     "cells that are inaccessible from the entrance of the maze " +
                     "(or there is no way from the entrance to the exit)."
             );
+        }
+
+        if (maze.getHeight() != clue.size) {
+            return new CheckResult(false,
+                "Number of rows in the maze is incorrect. " +
+                    "It's " + maze.getHeight() + ", but should be " + clue.size);
+        }
+
+        if (maze.getWidth() != clue.size) {
+            return new CheckResult(false,
+                "Number of columns in the maze is incorrect. " +
+                    "It's " + maze.getWidth() + ", but should be " + clue.size);
         }
 
         return CheckResult.correct();

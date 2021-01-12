@@ -1,6 +1,5 @@
 package maze;
 
-import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -8,17 +7,12 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        int height = scanner.nextInt();
-        int width = scanner.nextInt();
+        int height = Integer.parseInt(scanner.nextLine());
+        int width = Integer.parseInt(scanner.nextLine());
 
-        // FIXME for evens numbers
-        int rows = height / 2;
-        int cols = width / 2;
+        Maze maze = new Maze(height, width);
+        maze.digPassages();
 
-        Graph mst = new GenerateMaze().generateMaze(rows, cols);
-//        IPrint printIt = (mst, rows, cols) -> PrintMaze::print;
-//        printIt.print();
-        new PrintMaze().print(mst, rows, cols);
+        new ConsolePrinter().print(maze);
     }
-
 }

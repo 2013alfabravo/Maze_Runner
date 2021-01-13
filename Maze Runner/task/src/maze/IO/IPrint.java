@@ -1,4 +1,4 @@
-package maze;
+package maze.IO;
 
 @FunctionalInterface
 public interface IPrint {

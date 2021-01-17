@@ -90,27 +90,17 @@ public class Graph {
         return mst;
     }
 
-    // Works correctly for MST only, not suitable to other graphs
-    @Deprecated
-    public int getTotalMSTWeight() {
-        Set<String> visited = new HashSet<>();
-        int totalWeight = 0;
+    public boolean isConnected(String from, String to) {
+        Node fromNode = findNode(from);
+        if (fromNode == null)
+            throw new IllegalArgumentException();
 
-        Queue<Edge> queue = new ArrayDeque<>(start.adjacencyList);
-        visited.add(start.label);
+        Optional<Edge> connection = fromNode.adjacencyList
+                .stream()
+                .filter(edge -> edge.to.label.equals(to))
+                .findAny();
 
-        while (!queue.isEmpty()) {
-            Edge edge = queue.poll();
-            if (visited.contains(edge.to.label)) {
-                continue;
-            }
-
-            totalWeight += edge.weight;
-            visited.add(edge.to.label);
-            queue.addAll(edge.to.adjacencyList);
-        }
-
-        return totalWeight;
+        return connection.isPresent();
     }
     
     // Works correctly for any graph

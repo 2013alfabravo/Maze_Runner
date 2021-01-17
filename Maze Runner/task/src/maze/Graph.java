@@ -4,12 +4,75 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Graph {
-    List<Node> nodes = new ArrayList<>();
-    Node start;
+    private final List<Node> nodes = new ArrayList<>();
+    private Node start;
+
+    private static class Node {
+        final String label;
+        final List<Edge> adjacencyList = new ArrayList<>();
+
+        private Node(String label) {
+            this.label = label;
+        }
+
+        private void addLink(Node other, int weight) {
+            adjacencyList.add(new Edge(this, other, weight));
+        }
+
+        @Override
+        public String toString() {
+            return label + ": " + adjacencyList;
+        }
+    }
+
+    private static class Edge implements Comparable<Edge> {
+        Node from;
+        Node to;
+        int weight;
+
+        public Edge(Node from, Node to, int weight) {
+            this.from = from;
+            this.to = to;
+            this.weight = weight;
+        }
+
+        @Override
+        public String toString() {
+            return from.label + " --" + weight + "-> " + to.label;
+        }
+
+        @Override
+        public int compareTo(Edge other) {
+            return this.weight - other.weight;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Edge edge = (Edge) o;
+
+            if (weight != edge.weight) return false;
+            if (!this.from.label.equals(edge.from.label)) return false;
+            return to.label.equals(edge.to.label);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = from.hashCode();
+            result = 31 * result + to.hashCode();
+            result = 31 * result + weight;
+            return result;
+        }
+    }
 
     public void addNode(String label) {
         Node node = new Node(label);
-        addNode(node);
+        if (nodes.isEmpty()) {
+            start = node;
+        }
+        nodes.add(node);
     }
 
     @Override
@@ -32,18 +95,6 @@ public class Graph {
         return graph1Edges.containsAll(graph2Edges);
     }
 
-    private void addNode(Node node) {
-        if (nodes.isEmpty()) {
-            start = node;
-        }
-        nodes.add(node);
-    }
-
-    private void addLink(Node from, Node to, int weight) {
-        from.addLink(to, weight);
-        to.addLink(from, weight);
-    }
-
     public void addLink(String from, String to, int weight) {
         Node fromNode = findNode(from);
         Node toNode = findNode(to);
@@ -52,7 +103,8 @@ public class Graph {
             throw new IllegalArgumentException();
         }
 
-        addLink(fromNode, toNode, weight);
+        fromNode.addLink(toNode, weight);
+        toNode.addLink(fromNode, weight);
     }
 
     private Node findNode(String label) {
@@ -95,15 +147,11 @@ public class Graph {
         if (fromNode == null)
             throw new IllegalArgumentException();
 
-        Optional<Edge> connection = fromNode.adjacencyList
+        return fromNode.adjacencyList
                 .stream()
-                .filter(edge -> edge.to.label.equals(to))
-                .findAny();
-
-        return connection.isPresent();
+                .anyMatch(edge -> edge.to.label.equals(to));
     }
-    
-    // Works correctly for any graph
+
     public int getTotalGraphWeight() {
         return nodes.stream()
                 .flatMap(node -> node.adjacencyList.stream())
@@ -117,78 +165,4 @@ public class Graph {
                 .map(String::valueOf)
                 .collect(Collectors.joining("\n"));
     }
-
-    private class Node {
-        final String label;
-        final List<Edge> adjacencyList = new ArrayList<>();
-
-        private Node(String label) {
-            this.label = label;
-        }
-
-        private void addLink(Node other, int weight) {
-            adjacencyList.add(new Edge(this, other, weight));
-        }
-
-        @Override
-        public String toString() {
-            return label + ": " + adjacencyList;
-        }
-
-        @Override
-        public int hashCode() {
-            return super.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return super.equals(obj);
-        }
-    }
-
-    private class Edge implements Comparable<Edge> {
-        Node from;
-        Node to;
-        int weight;
-
-        public Edge(Node from, Node to, int weight) {
-            this.from = from;
-            this.to = to;
-            this.weight = weight;
-        }
-
-        @Override
-        public String toString() {
-            return from.label + " --" + weight + "-> " + to.label;
-        }
-
-        @Override
-        public int compareTo(Edge other) {
-            return this.weight - other.weight;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Edge edge = (Edge) o;
-
-            if (weight != edge.weight) return false;
-            if (!this.from.label.equals(edge.from.label)) return false;
-            return to.label.equals(edge.to.label);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = from.hashCode();
-            result = 31 * result + to.hashCode();
-            result = 31 * result + weight;
-            return result;
-        }
-    }
-
 }
-
-
-

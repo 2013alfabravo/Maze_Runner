@@ -6,6 +6,7 @@ import java.util.Random;
 public class Maze {
     private static final String WALL = "\u2588\u2588";
     private static final String PASSAGE = "  ";
+    private static final Random rnd = new Random();
 
     private final int[][] matrix;
     private final int heightLimit;
@@ -14,8 +15,44 @@ public class Maze {
     Maze(int height, int width) {
         matrix = new int[height][width];
         fillWithOnes();
-        heightLimit = isHeightEven() ? matrix.length - 1 : matrix.length;
-        widthLimit = isWidthEven() ? matrix[0].length - 1 : matrix[0].length;
+        heightLimit = getHeightLimit(height);
+        widthLimit = getWidthLimit(width);
+        digPassages();
+    }
+
+    Maze(String rawMazeFormat) {
+        matrix = readFromString(rawMazeFormat);
+        heightLimit = getHeightLimit(matrix.length);
+        widthLimit = getWidthLimit(matrix[0].length);
+    }
+
+    private int getHeightLimit(int height) {
+        return isHeightEven() ? height - 1 : height;
+    }
+
+    private int getWidthLimit(int width) {
+        return isWidthEven() ? width - 1 : width;
+    }
+
+    private int[][] readFromString(String rawMazeFormat) {
+        String[] tokens = rawMazeFormat.split(" ");
+        try {
+            int[][] matrix = new int[Integer.parseInt(tokens[0])][Integer.parseInt(tokens[1])];
+            int index = 2;
+            for (int row = 0; row < matrix.length; row++) {
+                for (int column = 0; column < matrix[row].length; column++) {
+                    int next = Integer.parseInt(tokens[index++]);
+                    if (next != 0 && next != 1) {
+                        throw new RuntimeException();
+                    }
+                    matrix[row][column] = next;
+                }
+            }
+
+            return matrix;
+        } catch (RuntimeException e) {
+            throw new RuntimeException();
+        }
     }
 
     private void fillWithOnes() {
@@ -30,7 +67,7 @@ public class Maze {
         return matrix[0].length % 2 == 0;
     }
 
-    public void digPassages() {
+    private void digPassages() {
         Graph mst = buildMST();
         for (int i = 1; i < heightLimit; i += 2) {
             for (int j = 1; j < widthLimit; j += 2) {
@@ -61,7 +98,6 @@ public class Maze {
         Graph graph = new Graph();
         addNodes(graph);
         linkAllNodes(graph);
-
         return graph.buildMST();
     }
 
@@ -74,7 +110,6 @@ public class Maze {
     }
 
     private void linkAllNodes(Graph graph) {
-        Random rnd = new Random();
         for (int i = 1; i < heightLimit; i += 2) {
             for (int j = 1; j < widthLimit; j += 2) {
                 if (i + 2 <= heightLimit - 1) {
@@ -97,6 +132,19 @@ public class Maze {
                 sb.append(block);
             }
             sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    public String toRawFormat() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(matrix.length).append(' ');
+        sb.append(matrix[0].length).append(' ');
+        for (int[] row : matrix) {
+            for (int cell : row) {
+                sb.append(cell).append(' ');
+            }
         }
 
         return sb.toString();

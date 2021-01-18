@@ -1,11 +1,9 @@
 package maze.IO;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.Scanner;
 
 public class TextFileReader implements IRead {
     private final String filename;
@@ -16,8 +14,9 @@ public class TextFileReader implements IRead {
 
     @Override
     public Optional<String> read() {
-        try (BufferedReader br = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
-            String input = br.readLine();
+        try (Scanner scanner = new Scanner(new File(filename), StandardCharsets.UTF_8)) {
+            scanner.useDelimiter("\\Z");
+            String input = scanner.next();
             return Optional.of(input);
         } catch (FileNotFoundException e) {
             return Optional.empty();

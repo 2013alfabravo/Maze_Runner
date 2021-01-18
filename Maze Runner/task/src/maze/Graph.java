@@ -67,6 +67,68 @@ public class Graph {
         }
     }
 
+    public List<String> labels() {
+        return nodes.stream().map(node -> node.label).collect(Collectors.toList());
+    }
+
+    // TODO ignores edge weights for now, needs to take them into account in a general case
+    public Graph findPath(String from, String to) {
+        assert findNode(from) != null && findNode(to) != null;
+
+        Set<String> visited = new HashSet<>();
+        Map<String, String> backtrack = new HashMap<>();
+        Queue<Edge> queue = new ArrayDeque<>(findNode(from).adjacencyList);
+
+        visited.add(from);
+        while (!queue.isEmpty()) {
+            Edge current = queue.poll();
+            if (visited.contains(current.to.label)) {
+                continue;
+            }
+
+            backtrack.put(current.to.label, current.from.label);
+
+            if (to.equals(current.to.label)) {
+                break;
+            }
+
+            queue.addAll(current.to.adjacencyList);
+            visited.add(current.from.label);
+        }
+
+        List<Node> path = getBacktrackList(to, backtrack);
+        Collections.reverse(path);
+
+        return linkedListOf(path);
+    }
+
+    private Graph linkedListOf(List<Node> path) {
+        Graph linkedList = new Graph();
+        linkedList.addNode(path.get(0).label);
+        for (int i = 1; i < path.size(); i++) {
+            linkedList.addNode(path.get(i).label);
+            linkedList.addLink(path.get(i).label, path.get(i - 1).label, 1);
+        }
+        return linkedList;
+    }
+
+    private List<Node> getBacktrackList(String end, Map<String, String> backtrack) {
+        List<Node> endToStartPath = new ArrayList<>();
+        String pointer = end;
+        endToStartPath.add(new Node(pointer));
+
+        while (true) {
+            String prevNodeLabel = backtrack.get(pointer);
+            if (prevNodeLabel == null) {
+                break;
+            }
+
+            endToStartPath.add(new Node(prevNodeLabel));
+            pointer = prevNodeLabel;
+        }
+        return endToStartPath;
+    }
+
     public void addNode(String label) {
         Node node = new Node(label);
         if (nodes.isEmpty()) {
@@ -96,12 +158,10 @@ public class Graph {
     }
 
     public void addLink(String from, String to, int weight) {
+        assert findNode(from) != null && findNode(to) != null;
+
         Node fromNode = findNode(from);
         Node toNode = findNode(to);
-
-        if (fromNode == null || toNode == null) {
-            throw new IllegalArgumentException();
-        }
 
         fromNode.addLink(toNode, weight);
         toNode.addLink(fromNode, weight);
@@ -143,11 +203,9 @@ public class Graph {
     }
 
     public boolean isConnected(String from, String to) {
-        Node fromNode = findNode(from);
-        if (fromNode == null)
-            throw new IllegalArgumentException();
+        assert findNode(from) != null && findNode(to) != null;
 
-        return fromNode.adjacencyList
+        return findNode(from).adjacencyList
                 .stream()
                 .anyMatch(edge -> edge.to.label.equals(to));
     }

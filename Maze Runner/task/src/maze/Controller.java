@@ -1,7 +1,6 @@
 package maze;
 
 import maze.IO.*;
-
 import java.util.Optional;
 
 public class Controller {
@@ -10,31 +9,36 @@ public class Controller {
     private IPrint printer = ConsolePrinter.getInstance();
     private Maze maze;
     private boolean isRunning = true;
-    private boolean menuIsNotComplete = true;
+    private boolean menuHasInvisibleItems = true;
 
     private void buildMenu() {
-        menu = new Menu("=== Menu ===")
+        menu = new Menu()
+                .setTitle("=== Menu ===")
                 .addMenuItem("1", "Generate a new maze", this::generateMaze)
                 .addMenuItem("2", "Load a maze", this::loadMaze)
-                .addMenuItem("0", "Exit", this::exit);
+                .addMenuItem("3", "Save the maze", this::saveMaze)
+                .addMenuItem("4", "Display the maze", this::displayMaze)
+                .addMenuItem("5", "Find the escape", this::findEscape)
+                .addMenuItem("0", "Exit", this::exit)
+                .setInvisible("3")
+                .setInvisible("4")
+                .setInvisible("5");
     }
 
-    private void completeMenu() {
-        menu.removeMenuItem("0");
+    private void makeAllMenuItemsVisible() {
+        menu.setVisible("3")
+        .setVisible("4")
+        .setVisible("5");
 
-        menu.addMenuItem("3", "Save the maze", this::saveMaze)
-                .addMenuItem("4", "Display the maze", this::displayMaze)
-                .addMenuItem("0", "Exit", this::exit);
-
-        menuIsNotComplete = false;
+        menuHasInvisibleItems = false;
     }
 
     public void execute() {
         buildMenu();
 
         while (isRunning) {
-            if (menuNeedsCompletion()) {
-                completeMenu();
+            if (menuNeedsUpdating()) {
+                makeAllMenuItemsVisible();
             }
 
             printer.print(menu);
@@ -55,12 +59,12 @@ public class Controller {
         printer.print("Enter a file name");
         String filename = reader.read().orElse("maze.txt");
         printer = new FilePrinter(filename);
-        printer.print(maze.toRawFormat());
+        printer.print(maze.toString());
         printer = ConsolePrinter.getInstance();
     }
 
-    private boolean menuNeedsCompletion() {
-        return maze != null && menuIsNotComplete;
+    private boolean menuNeedsUpdating() {
+        return maze != null && menuHasInvisibleItems;
     }
 
     private void generateMaze() {
@@ -89,18 +93,16 @@ public class Controller {
             return;
         }
 
-        maze = getMazeFromString(payload.get());
+        Maze maze = Maze.fromString(payload.get());
         if (maze == null) {
             printer.print("Cannot load the maze. It has an invalid format");
+        } else {
+            this.maze = maze;
         }
     }
 
-    private Maze getMazeFromString(String rawString) {
-        try {
-            return new Maze(rawString);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+    private void findEscape() {
+        printer.print(new MazeSolver(maze).getMazeSolution());
     }
 
     private Optional<String> readFile(String filename) {

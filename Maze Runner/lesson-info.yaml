@@ -1,6 +1,0 @@
-type: framework
-content:
-- Display a maze
-- Saved and loaded
-- A way out
-current_task: 1
